@@ -28,7 +28,7 @@ function Orders() {
 
   const handleSelectProduct = (product: Prodcut) => {
     const isAlreadySelected = checkIsSelected(selectedProducts, product)
-  
+
     if (isAlreadySelected) {
       const selected = selectedProducts.filter(item => item.id !== product.id);
       setSelectedProducts(selected);
@@ -43,10 +43,20 @@ function Orders() {
       ...orderLocation!,
       products: productsIds
     }
-  
+
     saveOrder(payload).then((response) => {
-      toast.error(`Pedido enviado com sucesso! Nº ${response.data.id}`);
-      setSelectedProducts([]);
+      if (totalPrice === 0) {
+        toast.warning('Selecione um produto.')
+      }
+      else if (payload.address == null){
+        toast.warning('Digite o endereço de entrega.')
+      }
+      else
+      {
+        toast.error(`Pedido enviado com sucesso! Nº ${response.data.id}`);
+        setSelectedProducts([]);       
+      }
+
     })
       .catch(() => {
         toast.warning('Erro ao enviar pedido');
@@ -57,17 +67,17 @@ function Orders() {
     <>
       <div className="orders-container">
         <StepsHeader />
-        <ProductsList 
+        <ProductsList
           products={products}
           onSelectProduct={handleSelectProduct}
           selectedProducts={selectedProducts}
         />
-        <OrderLocation 
-          onChangeLocation={location => setOrderLocation(location)} 
+        <OrderLocation
+          onChangeLocation={location => setOrderLocation(location)}
         />
-        <OrderSummary 
-          amount={selectedProducts.length} 
-          totalPrice={totalPrice} 
+        <OrderSummary
+          amount={selectedProducts.length}
+          totalPrice={totalPrice}
           onSubmit={handleSubmit}
         />
       </div>
